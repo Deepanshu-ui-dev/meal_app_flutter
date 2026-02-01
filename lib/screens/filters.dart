@@ -1,37 +1,38 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:meal_app/providers/filters_provider.dart';
 
-enum Filter {
-  glutenFree,
-  lactoseFree,
-  vegan,
-  vegetarian,
-}
-
-class FiltersScreen extends StatefulWidget {
-  const FiltersScreen({
-    super.key,
-    required this.currentFilters,
-  });
-
-  final Map<Filter, bool> currentFilters;
+class FiltersScreen extends ConsumerStatefulWidget {
+  const FiltersScreen({super.key});
 
   @override
-  State<FiltersScreen> createState() => _FilterScreenState();
+  ConsumerState<FiltersScreen> createState() => _FiltersScreenState();
 }
 
-class _FilterScreenState extends State<FiltersScreen> {
-  bool _isGlutenFree = false;
-  bool _isLactoseFree = false;
-  bool _isVegan = false;
-  bool _isVegetarian = false;
+class _FiltersScreenState extends ConsumerState<FiltersScreen> {
+  late bool _glutenFree;
+  late bool _lactoseFree;
+  late bool _vegetarian;
+  late bool _vegan;
 
   @override
   void initState() {
-    _isGlutenFree = widget.currentFilters[Filter.glutenFree] ?? false;
-    _isLactoseFree = widget.currentFilters[Filter.lactoseFree] ?? false;
-    _isVegan = widget.currentFilters[Filter.vegan] ?? false;
-    _isVegetarian = widget.currentFilters[Filter.vegetarian] ?? false;
     super.initState();
+    final activeFilters = ref.read(filtersProvider);
+
+    _glutenFree = activeFilters[Filter.glutenFree]!;
+    _lactoseFree = activeFilters[Filter.lactoseFree]!;
+    _vegetarian = activeFilters[Filter.vegetarian]!;
+    _vegan = activeFilters[Filter.vegan]!;
+  }
+
+  void _saveFilters() {
+    ref.read(filtersProvider.notifier).setFilters({
+      Filter.glutenFree: _glutenFree,
+      Filter.lactoseFree: _lactoseFree,
+      Filter.vegetarian: _vegetarian,
+      Filter.vegan: _vegan,
+    });
   }
 
   @override
@@ -41,62 +42,87 @@ class _FilterScreenState extends State<FiltersScreen> {
         title: const Text('Your Filters'),
       ),
       body: PopScope(
-        canPop: false,
+        canPop: true,
         onPopInvoked: (didPop) {
-          if (didPop) return;
-
-          Navigator.of(context).pop({
-            Filter.glutenFree: _isGlutenFree,
-            Filter.lactoseFree: _isLactoseFree,
-            Filter.vegan: _isVegan,
-            Filter.vegetarian: _isVegetarian,
-          });
+          if (!didPop) return;
+          _saveFilters();
         },
-        child: Column(
+        child: ListView(
           children: [
-            SwitchListTile(
-              value: _isGlutenFree,
+            _buildSwitch(
+              context: context,
+              title: 'Gluten-free',
+              subtitle: 'Only include gluten-free meals.',
+              value: _glutenFree,
               onChanged: (value) {
                 setState(() {
-                  _isGlutenFree = value;
+                  _glutenFree = value;
                 });
               },
-              title: const Text('Gluten-Free'),
-              subtitle: const Text('Only include gluten-free meals.'),
             ),
-            SwitchListTile(
-              value: _isLactoseFree,
+            _buildSwitch(
+              context: context,
+              title: 'Lactose-free',
+              subtitle: 'Only include lactose-free meals.',
+              value: _lactoseFree,
               onChanged: (value) {
                 setState(() {
-                  _isLactoseFree = value;
+                  _lactoseFree = value;
                 });
               },
-              title: const Text('Lactose-Free'),
-              subtitle: const Text('Only include lactose-free meals.'),
             ),
-            SwitchListTile(
-              value: _isVegan,
+            _buildSwitch(
+              context: context,
+              title: 'Vegetarian',
+              subtitle: 'Only include vegetarian meals.',
+              value: _vegetarian,
               onChanged: (value) {
                 setState(() {
-                  _isVegan = value;
+                  _vegetarian = value;
                 });
               },
-              title: const Text('Vegan'),
-              subtitle: const Text('Only include vegan meals.'),
             ),
-            SwitchListTile(
-              value: _isVegetarian,
+            _buildSwitch(
+              context: context,
+              title: 'Vegan',
+              subtitle: 'Only include vegan meals.',
+              value: _vegan,
               onChanged: (value) {
                 setState(() {
-                  _isVegetarian = value;
+                  _vegan = value;
                 });
               },
-              title: const Text('Vegetarian'),
-              subtitle: const Text('Only include vegetarian meals.'),
             ),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildSwitch({
+    required BuildContext context,
+    required String title,
+    required String subtitle,
+    required bool value,
+    required void Function(bool) onChanged,
+  }) {
+    return SwitchListTile(
+      value: value,
+      onChanged: onChanged,
+      title: Text(
+        title,
+        style: Theme.of(context).textTheme.titleLarge!.copyWith(
+              color: Theme.of(context).colorScheme.onBackground,
+            ),
+      ),
+      subtitle: Text(
+        subtitle,
+        style: Theme.of(context).textTheme.labelMedium!.copyWith(
+              color: Theme.of(context).colorScheme.onBackground,
+            ),
+      ),
+      activeColor: Theme.of(context).colorScheme.tertiary,
+      contentPadding: const EdgeInsets.only(left: 34, right: 22),
     );
   }
 }

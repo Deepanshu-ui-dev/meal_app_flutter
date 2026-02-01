@@ -5,54 +5,50 @@ import 'package:meal_app/models/meal.dart';
 import 'package:meal_app/screens/meals.dart';
 import 'package:meal_app/widgets/category_grid_item.dart';
 
+
 class CategoriesScreen extends StatelessWidget {
   const CategoriesScreen({
     super.key,
     required this.availableMeals,
-    required this.onToggleFvt,
   });
 
   final List<Meal> availableMeals;
-  final void Function(Meal meal) onToggleFvt;
 
   void _selectCategory(BuildContext context, Category category) {
     final filteredMeals = availableMeals
         .where((meal) => meal.categories.contains(category.id))
         .toList();
 
-    Navigator.push(
-      context,
+    Navigator.of(context).push(
       MaterialPageRoute(
         builder: (ctx) => MealsScreen(
           title: category.title,
           meals: filteredMeals,
-          onToggleFvt: onToggleFvt,
         ),
       ),
-    );
+    ); // Navigator.push(context, route)
   }
 
   @override
   Widget build(BuildContext context) {
-    return GridView.builder(
+    return GridView(
       padding: const EdgeInsets.all(24),
-      itemCount: availableCategories.length,
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
         childAspectRatio: 3 / 2,
         crossAxisSpacing: 20,
         mainAxisSpacing: 20,
       ),
-      itemBuilder: (context, index) {
-        final category = availableCategories[index];
-
-        return CategoryGridItem(
-          category: category,
-          onSelectCategory: () {
-            _selectCategory(context, category);
-          },
-        );
-      },
+      children: [
+        // availableCategories.map((category) => CategoryGridItem(category: category)).toList()
+        for (final category in availableCategories)
+          CategoryGridItem(
+            category: category,
+            onSelectCategory: () {
+              _selectCategory(context, category);
+            },
+          )
+      ],
     );
   }
 }

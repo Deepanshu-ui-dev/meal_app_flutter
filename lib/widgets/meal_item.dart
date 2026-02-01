@@ -14,12 +14,12 @@ class MealItem extends StatelessWidget {
   final Meal meal;
   final void Function(Meal meal) onSelectMeal;
 
-  String get complexitytext {
+  String get complexityText {
     return meal.complexity.name[0].toUpperCase() +
         meal.complexity.name.substring(1);
   }
 
-  String get affodablitytext {
+  String get affordabilityText {
     return meal.affordability.name[0].toUpperCase() +
         meal.affordability.name.substring(1);
   }
@@ -77,12 +77,12 @@ class MealItem extends StatelessWidget {
                         const SizedBox(width: 12),
                         MealItemTrait(
                           icon: Icons.work,
-                          label: complexitytext,
+                          label: complexityText,
                         ),
                         const SizedBox(width: 12),
                         MealItemTrait(
                           icon: Icons.attach_money,
-                          label: affodablitytext,
+                          label: affordabilityText,
                         ),
                       ],
                     )
