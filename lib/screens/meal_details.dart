@@ -17,7 +17,7 @@ class MealDetailsScreen extends ConsumerWidget {
     final isFavorite = ref.watch(favoriteMealsProvider).contains(meal);
 
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: const Color.fromARGB(255, 0, 0, 0),
       appBar: AppBar(
         backgroundColor: Colors.black,
         iconTheme: const IconThemeData(color: Colors.white),

@@ -2,99 +2,64 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:meal_app/providers/filters_provider.dart';
 
-class FiltersScreen extends ConsumerStatefulWidget {
+class FiltersScreen extends ConsumerWidget {
   const FiltersScreen({super.key});
 
   @override
-  ConsumerState<FiltersScreen> createState() => _FiltersScreenState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final activeFilters = ref.watch(filtersProvider);
 
-class _FiltersScreenState extends ConsumerState<FiltersScreen> {
-  late bool _glutenFree;
-  late bool _lactoseFree;
-  late bool _vegetarian;
-  late bool _vegan;
-
-  @override
-  void initState() {
-    super.initState();
-    final activeFilters = ref.read(filtersProvider);
-
-    _glutenFree = activeFilters[Filter.glutenFree]!;
-    _lactoseFree = activeFilters[Filter.lactoseFree]!;
-    _vegetarian = activeFilters[Filter.vegetarian]!;
-    _vegan = activeFilters[Filter.vegan]!;
-  }
-
-  void _saveFilters() {
-    ref.read(filtersProvider.notifier).setFilters({
-      Filter.glutenFree: _glutenFree,
-      Filter.lactoseFree: _lactoseFree,
-      Filter.vegetarian: _vegetarian,
-      Filter.vegan: _vegan,
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Your Filters'),
       ),
-      body: PopScope(
-        canPop: true,
-        onPopInvoked: (didPop) {
-          if (!didPop) return;
-          _saveFilters();
-        },
-        child: ListView(
-          children: [
-            _buildSwitch(
-              context: context,
-              title: 'Gluten-free',
-              subtitle: 'Only include gluten-free meals.',
-              value: _glutenFree,
-              onChanged: (value) {
-                setState(() {
-                  _glutenFree = value;
-                });
-              },
-            ),
-            _buildSwitch(
-              context: context,
-              title: 'Lactose-free',
-              subtitle: 'Only include lactose-free meals.',
-              value: _lactoseFree,
-              onChanged: (value) {
-                setState(() {
-                  _lactoseFree = value;
-                });
-              },
-            ),
-            _buildSwitch(
-              context: context,
-              title: 'Vegetarian',
-              subtitle: 'Only include vegetarian meals.',
-              value: _vegetarian,
-              onChanged: (value) {
-                setState(() {
-                  _vegetarian = value;
-                });
-              },
-            ),
-            _buildSwitch(
-              context: context,
-              title: 'Vegan',
-              subtitle: 'Only include vegan meals.',
-              value: _vegan,
-              onChanged: (value) {
-                setState(() {
-                  _vegan = value;
-                });
-              },
-            ),
-          ],
-        ),
+      body: ListView(
+        children: [
+          _buildSwitch(
+            context: context,
+            title: 'Gluten-free',
+            subtitle: 'Only include gluten-free meals.',
+            value: activeFilters[Filter.glutenFree]!,
+            onChanged: (value) {
+              ref
+                  .read(filtersProvider.notifier)
+                  .setFilter(Filter.glutenFree, value);
+            },
+          ),
+          _buildSwitch(
+            context: context,
+            title: 'Lactose-free',
+            subtitle: 'Only include lactose-free meals.',
+            value: activeFilters[Filter.lactoseFree]!,
+            onChanged: (value) {
+              ref
+                  .read(filtersProvider.notifier)
+                  .setFilter(Filter.lactoseFree, value);
+            },
+          ),
+          _buildSwitch(
+            context: context,
+            title: 'Vegetarian',
+            subtitle: 'Only include vegetarian meals.',
+            value: activeFilters[Filter.vegetarian]!,
+            onChanged: (value) {
+              ref
+                  .read(filtersProvider.notifier)
+                  .setFilter(Filter.vegetarian, value);
+            },
+          ),
+          _buildSwitch(
+            context: context,
+            title: 'Vegan',
+            subtitle: 'Only include vegan meals.',
+            value: activeFilters[Filter.vegan]!,
+            onChanged: (value) {
+              ref
+                  .read(filtersProvider.notifier)
+                  .setFilter(Filter.vegan, value);
+            },
+          ),
+        ],
       ),
     );
   }
