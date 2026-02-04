@@ -17,7 +17,7 @@ class MealDetailsScreen extends ConsumerWidget {
     final isFavorite = ref.watch(favoriteMealsProvider).contains(meal);
 
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 0, 0, 0),
+      backgroundColor: Colors.black,
       appBar: AppBar(
         backgroundColor: Colors.black,
         iconTheme: const IconThemeData(color: Colors.white),
@@ -27,21 +27,40 @@ class MealDetailsScreen extends ConsumerWidget {
         ),
         actions: [
           IconButton(
+            tooltip: 'Toggle Favorite',
             onPressed: () {
               final wasAdded = ref
                   .read(favoriteMealsProvider.notifier)
                   .toggleMealFavoriteStatus(meal);
 
-                  ScaffoldMessenger.of(context).clearSnackBars();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(wasAdded ? 'Meal addedas a favorite' : 'Meal removed'),)
-                  );
+              ScaffoldMessenger.of(context).clearSnackBars();
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    wasAdded
+                        ? 'Meal added as a favorite'
+                        : 'Meal removed from favorites',
+                  ),
+                ),
+              );
             },
-            tooltip: 'Toggle Favorite',
-            icon: Icon(
-              isFavorite ? Icons.star : Icons.star_border,
-              color: Colors.white,
+            icon: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 300),
+              transitionBuilder: (child, animation) {
+                return ScaleTransition(
+                  scale: Tween(begin: 0.8, end: 1.0).animate(animation),
+                  child: RotationTransition(
+                    turns: Tween(begin: 0.75, end: 1.0).animate(animation),
+                    child: child,
+                  ),
+                );
+              },
+              child: Icon(
+                isFavorite ? Icons.star : Icons.star_border,
+                key: ValueKey(isFavorite),
+                color: Colors.white,
+                size: 32, 
+              ),
             ),
           ),
         ],
@@ -58,9 +77,7 @@ class MealDetailsScreen extends ConsumerWidget {
               placeholder: MemoryImage(kTransparentImage),
               image: NetworkImage(meal.imageUrl),
             ),
-
             const SizedBox(height: 16),
-
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Text(
@@ -72,9 +89,7 @@ class MealDetailsScreen extends ConsumerWidget {
                 ),
               ),
             ),
-
             const SizedBox(height: 24),
-
             _sectionTitle('Ingredients'),
             _infoCard(
               child: Text(
@@ -82,9 +97,7 @@ class MealDetailsScreen extends ConsumerWidget {
                 style: const TextStyle(color: Colors.white70),
               ),
             ),
-
             const SizedBox(height: 24),
-
             _sectionTitle('Steps'),
             _infoCard(
               child: Column(
@@ -102,7 +115,6 @@ class MealDetailsScreen extends ConsumerWidget {
                     .toList(),
               ),
             ),
-
             const SizedBox(height: 24),
           ],
         ),
